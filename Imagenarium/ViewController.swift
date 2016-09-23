@@ -11,7 +11,6 @@ import UIKit
 class ViewController: UIViewController {
     
     @IBOutlet weak var imageView: UIImageView!
-    
     @IBOutlet weak var filterButton: UIButton!
     
     private var rgbaOriginalImage: RGBAImage?
@@ -20,14 +19,14 @@ class ViewController: UIViewController {
     @IBAction func onApplyFilterClick(sender: UIButton) {
         if(sender.selected) {
             imageView.image = originalImage
-            filterButton.selected = false;
         } else {
             imageView.image = GrayScaleFilter.INSTANCE.apply(&rgbaOriginalImage!).toUIImage()
-            filterButton.selected = true;
         }
+        filterButton.selected = !sender.selected;
     }
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
         originalImage = UIImage(named: "london")

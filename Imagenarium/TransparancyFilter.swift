@@ -2,9 +2,6 @@ import Foundation
 
 public class TransparancyFilter: Filter {
     
-    public static let FULL:TransparancyFilter = TransparancyFilter(alpha: 255)
-    public static let HALF:TransparancyFilter = TransparancyFilter(alpha: 128)
-    
     private let alpha:UInt8
     
     public init(alpha: UInt8) {
