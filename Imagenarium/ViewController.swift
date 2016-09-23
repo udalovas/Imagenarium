@@ -22,7 +22,7 @@ class ViewController: UIViewController {
             imageView.image = originalImage
             filterButton.selected = false;
         } else {
-            imageView.image = SepiaFilter.INSTANCE.apply(&rgbaOriginalImage!).toUIImage()
+            imageView.image = GrayScaleFilter.INSTANCE.apply(&rgbaOriginalImage!).toUIImage()
             filterButton.selected = true;
         }
     }

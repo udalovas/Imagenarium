@@ -22,7 +22,7 @@
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7fF-C1-Lal">
                                 <rect key="frame" x="56" y="430" width="141" height="30"/>
-                                <state key="normal" title="Sepia"/>
+                                <state key="normal" title="Gray Scale"/>
                                 <connections>
                                     <action selector="onApplyFilterClick:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="GQk-rh-fiz"/>
                                 </connections>
