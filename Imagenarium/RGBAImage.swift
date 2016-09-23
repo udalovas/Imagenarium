@@ -4,6 +4,16 @@ public struct Pixel {
     
     public var value: UInt32
     
+    public init(red:UInt8, green:UInt8, blue:UInt8, alpha:UInt8) {
+        
+        value = 0
+        
+        self.red = red
+        self.green = green
+        self.blue = blue
+        self.alpha = alpha
+    }
+    
     public var red: UInt8 {
         get {
             return UInt8(value & 0xFF)

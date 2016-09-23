@@ -14,21 +14,17 @@ public class GrayScaleFilter: Filter {
     
     public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
         
-        for y in 0 ..< rgbaImage.height {
-            for x in 0 ..< rgbaImage.width {
-                
-                let index = y * rgbaImage.width + x
-                var pixel = rgbaImage.pixels[index]
-                
-                let gray = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue)) / 3
-                
-                pixel.red = UInt8(gray)
-                pixel.green = UInt8(gray)
-                pixel.blue = UInt8(gray)
-                
-                rgbaImage.pixels[index] = pixel
-            }
-        }
+        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
+            
+            let gray = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue)) / 3
+            
+            return Pixel(
+                red: UInt8(gray),
+                green: UInt8(gray),
+                blue: UInt8(gray),
+                alpha: pixel.alpha)
+        })
+        
         return rgbaImage
     }
 }

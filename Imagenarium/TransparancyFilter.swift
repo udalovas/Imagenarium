@@ -11,14 +11,15 @@ public class TransparancyFilter: Filter {
         self.alpha = alpha;
     }
     
-    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage{
+    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
         
-        for y in 0..<rgbaImage.height {
-            for x in 0..<rgbaImage.width {
-                let index = y * rgbaImage.width + x;
-                rgbaImage.pixels[index].alpha = self.alpha;
-            }
-        }
+        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
+            return Pixel(
+                red: pixel.alpha,
+                green: pixel.green,
+                blue: pixel.blue,
+                alpha: self.alpha)
+        })
         
         return rgbaImage
     }

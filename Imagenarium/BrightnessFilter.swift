@@ -17,16 +17,15 @@ public class BrightnessFilter: Filter {
     }
     
     public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
-        for y in 0 ..< rgbaImage.height {
-            for x in 0 ..< rgbaImage.width {
-                let index = y * rgbaImage.width + x
-                var pixel = rgbaImage.pixels[index]
-                
-                pixel.alpha = UInt8(max(0, min(255, level * 255)))
-                
-                rgbaImage.pixels[index] = pixel
-            }
-        }
+        
+        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
+            return Pixel(
+                red: pixel.red,
+                green: pixel.green,
+                blue: pixel.blue,
+                alpha: UInt8(max(0, min(255, level * 255))))
+        })
+        
         return rgbaImage
     }
 }
