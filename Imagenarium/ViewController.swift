@@ -30,7 +30,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        originalImage = UIImage(named: "spain")
+        originalImage = UIImage(named: "london")
         rgbaOriginalImage = RGBAImage(image: originalImage!)
         
         imageView.image = originalImage
