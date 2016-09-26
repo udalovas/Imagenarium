@@ -8,8 +8,9 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
     
+    @IBOutlet var newPhotoButton: UIButton!
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var secondaryMenu: UIView!
     
@@ -19,7 +20,55 @@ class ViewController: UIViewController {
     private var rgbaOriginalImage: RGBAImage?
     private var originalImage: UIImage?
 
-    @IBAction func onFilter(sender: UIButton) {
+    @IBAction func onNewPhoto(sender: UIButton) {
+        
+        let photoActionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .ActionSheet)
+        
+        photoActionSheet.popoverPresentationController?.sourceView = newPhotoButton
+        
+        photoActionSheet.addAction(UIAlertAction(title: "Camera", style: .Default, handler: { action in
+            self.showCamera()
+        }))
+
+        photoActionSheet.addAction(UIAlertAction(title: "Album", style: .Default, handler: { action in
+            self.showAlbum()
+        }))
+        
+        photoActionSheet.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
+        
+        self.presentViewController(photoActionSheet, animated: true, completion: nil)
+    }
+    
+    func showCamera() {
+        
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .Camera
+        
+        self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    func showAlbum() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .PhotoLibrary
+        
+        self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        dismissViewControllerAnimated(true, completion: nil)
+        imageView.image = (info[UIImagePickerControllerOriginalImage] as! UIImage)
+    }
+    
+    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
+    @IBAction func onShare(sender: UIButton) {
+    }
+    
+    @IBAction func onFilter(sender: UIButton) { 
         if(!sender.selected) {
             showSecondaryMenu()
         } else {

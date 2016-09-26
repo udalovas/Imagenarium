@@ -35,6 +35,9 @@
                                                             <constraint firstAttribute="height" constant="44" id="YtS-qq-rew"/>
                                                         </constraints>
                                                         <state key="normal" title="New Photo"/>
+                                                        <connections>
+                                                            <action selector="onNewPhoto:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QUT-np-FuH"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="si7-GY-Tod">
                                                         <rect key="frame" x="150" y="0.0" width="150" height="44"/>
@@ -77,6 +80,9 @@
                                                                 <exclude reference="CbE-Gl-Cej"/>
                                                             </mask>
                                                         </variation>
+                                                        <connections>
+                                                            <action selector="onShare:" destination="BYZ-38-t0r" eventType="touchUpInside" id="wtL-eP-zId"/>
+                                                        </connections>
                                                     </button>
                                                 </subviews>
                                             </stackView>
@@ -114,6 +120,7 @@
                         <outlet property="bottomMenu" destination="8kH-P7-39w" id="xjB-0M-A3V"/>
                         <outlet property="filterButton" destination="si7-GY-Tod" id="x6g-W0-Rp8"/>
                         <outlet property="imageView" destination="qoN-Ng-MGG" id="Anm-dN-tsf"/>
+                        <outlet property="newPhotoButton" destination="7fF-C1-Lal" id="qGh-vp-rqr"/>
                         <outlet property="secondaryMenu" destination="up8-68-jJa" id="1G9-Zd-chb"/>
                     </connections>
                 </viewController>
