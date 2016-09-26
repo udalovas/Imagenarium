@@ -21,14 +21,14 @@ class ViewController: UIViewController {
 
     @IBAction func onFilter(sender: UIButton) {
         if(!sender.selected) {
-            showSubmenu()
+            showSecondaryMenu()
         } else {
-            secondaryMenu.removeFromSuperview()
+            hideSecondaryMenu()
         }
         sender.selected = !sender.selected
     }
     
-    func showSubmenu() {
+    func showSecondaryMenu() {
         
         view.addSubview(secondaryMenu)
         
@@ -41,6 +41,22 @@ class ViewController: UIViewController {
         NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         
         view.layoutIfNeeded()
+        
+        self.secondaryMenu.alpha = 0
+        UIView.animateWithDuration(0.4) { 
+            self.secondaryMenu.alpha = 1
+        }
+    }
+    
+    func hideSecondaryMenu () {
+        
+        UIView.animateWithDuration(0.4, animations: { 
+            self.secondaryMenu.alpha = 0
+            }) { (completed) in
+                if(completed == true) {
+                    self.secondaryMenu.removeFromSuperview()
+                }
+        }
     }
     
     func onApplyFilterClick(sender: UIButton) {
@@ -49,7 +65,6 @@ class ViewController: UIViewController {
         } else {
             imageView.image = GrayScaleFilter.INSTANCE.apply(&rgbaOriginalImage!).toUIImage()
         }
-        filterButton.selected = !sender.selected;
     }
     
     override func viewDidLoad() {
@@ -63,7 +78,6 @@ class ViewController: UIViewController {
         rgbaOriginalImage = RGBAImage(image: originalImage!)
         
         imageView.image = originalImage
-        filterButton.setTitle("Original", forState: .Selected)
     }
 
     override func didReceiveMemoryWarning() {
