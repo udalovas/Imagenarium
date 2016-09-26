@@ -10,7 +10,13 @@ import Foundation
 
 public class EnhancedRedFilter: Filter {
     
+    public static let DEFAULT_LEVEL:Int = 5;
+    
     private let level:Int
+    
+    public convenience init() {
+        self.init(level: EnhancedRedFilter.DEFAULT_LEVEL)
+    }
     
     public init(level: Int) {
         self.level = level;

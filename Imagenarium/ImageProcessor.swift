@@ -2,6 +2,23 @@ import Foundation
 
 public class ImageProcessor {
     
+    public enum FilterType: String {
+        case Sepia, GrayScale, RedRose
+        
+        static let all:[FilterType] = [Sepia, GrayScale, RedRose];
+    }
+    
+    public static func getFilter(filter:FilterType) -> Filter {
+        switch filter {
+        case .GrayScale:
+            return GrayScaleFilter.INSTANCE
+        case .Sepia:
+            return SepiaFilter.INSTANCE
+        case .RedRose:
+            return EnhancedRedFilter()
+        }
+    }
+    
     public static func getAvgColors(rgbaImage:RGBAImage) -> (R: Int, G: Int, B: Int) {
         
         let total = rgbaImage.pixels.reduce((0, 0, 0)) { (accumulator: (Int, Int, Int), pixel) -> (Int, Int, Int) in

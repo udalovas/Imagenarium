@@ -13,9 +13,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     @IBOutlet var newPhotoButton: UIButton!
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var secondaryMenu: UIView!
+    @IBOutlet var filtersContainer: UIStackView!
     
     @IBOutlet var bottomMenu: UIView!
-    @IBOutlet weak var filterButton: UIButton!
+    @IBOutlet var filterButton: UIButton!
     
     private var rgbaOriginalImage: RGBAImage?
     private var originalImage: UIImage?
@@ -82,7 +83,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     func showSecondaryMenu() {
         
         view.addSubview(secondaryMenu)
-        
+
         let bottomConstraint = secondaryMenu.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
         let leftConstraint = secondaryMenu.leftAnchor.constraintEqualToAnchor(bottomMenu.leftAnchor)
         let rightConstraint = secondaryMenu.rightAnchor.constraintEqualToAnchor(bottomMenu.rightAnchor)
@@ -124,6 +125,17 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
         secondaryMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        
+        for filter in ImageProcessor.FilterType.all {
+            
+            let filterButton = UIButton(type: .System)
+            filterButton.setTitle(filter.rawValue, forState: .Normal)
+            
+            filtersContainer.addArrangedSubview(filterButton)
+        }
+        
+//        filtersContainer.layoutIfNeeded()
+//        secondaryMenu.layoutIfNeeded()
         
         originalImage = UIImage(named: "london")
         rgbaOriginalImage = RGBAImage(image: originalImage!)
