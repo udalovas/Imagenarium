@@ -10,13 +10,40 @@ import UIKit
 
 class ViewController: UIViewController {
     
-    @IBOutlet weak var imageView: UIImageView!
+    @IBOutlet var imageView: UIImageView!
+    @IBOutlet var secondaryMenu: UIView!
+    
+    @IBOutlet var bottomMenu: UIView!
     @IBOutlet weak var filterButton: UIButton!
     
     private var rgbaOriginalImage: RGBAImage?
     private var originalImage: UIImage?
 
-    @IBAction func onApplyFilterClick(sender: UIButton) {
+    @IBAction func onFilter(sender: UIButton) {
+        if(!sender.selected) {
+            showSubmenu()
+        } else {
+            secondaryMenu.removeFromSuperview()
+        }
+        sender.selected = !sender.selected
+    }
+    
+    func showSubmenu() {
+        
+        view.addSubview(secondaryMenu)
+        
+        let bottomConstraint = secondaryMenu.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
+        let leftConstraint = secondaryMenu.leftAnchor.constraintEqualToAnchor(bottomMenu.leftAnchor)
+        let rightConstraint = secondaryMenu.rightAnchor.constraintEqualToAnchor(bottomMenu.rightAnchor)
+        
+        let heightConstraint = secondaryMenu.heightAnchor.constraintEqualToConstant(44)
+        
+        NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
+        
+        view.layoutIfNeeded()
+    }
+    
+    func onApplyFilterClick(sender: UIButton) {
         if(sender.selected) {
             imageView.image = originalImage
         } else {
@@ -28,6 +55,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        
+        secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
+        secondaryMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
         
         originalImage = UIImage(named: "london")
         rgbaOriginalImage = RGBAImage(image: originalImage!)

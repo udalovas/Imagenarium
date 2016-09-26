@@ -7,7 +7,6 @@
 //
 
 import XCTest
-@testable import Imagenarium
 
 class ImagenariumTests: XCTestCase {
     
