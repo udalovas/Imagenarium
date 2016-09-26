@@ -66,6 +66,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     @IBAction func onShare(sender: UIButton) {
+        let activityController = UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil)
+        presentViewController(activityController, animated: true, completion: nil)
     }
     
     @IBAction func onFilter(sender: UIButton) { 
