@@ -12,18 +12,22 @@ public class SepiaFilter : Filter {
     
     public static let INSTANCE:Filter = SepiaFilter()
     
-    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
-        
-        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
-            
-            return Pixel(
-                red: UInt8(min(Int(Double(pixel.red) * 0.393 + Double(pixel.green) * 0.769 + Double(pixel.blue) * 0.189), 255)),
-                green: UInt8(min(Int((Double(pixel.red) * 0.349) + (Double(pixel.green) * 0.686) + (Double(pixel.blue) * 0.168)), 255)),
-                blue: UInt8(min(Int((Double(pixel.red) * 0.272) + (Double(pixel.green) * 0.534) + (Double(pixel.blue) * 0.131)), 255)),
-                alpha: pixel.alpha)
-        })
-        
-        return rgbaImage
+    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+        return RGBAImage(
+            pixels: rgbaImage.pixels.map({ pixel -> Pixel in
+                
+                let red = min(Double(pixel.red) * 0.393 + Double(pixel.green) * 0.769 + Double(pixel.blue) * 0.189, 255)
+                let green = min(Double(pixel.red) * 0.349 + Double(pixel.green) * 0.686 + Double(pixel.blue) * 0.168, 255)
+                let blue = min(Double(pixel.red) * 0.272 + Double(pixel.green) * 0.534 + Double(pixel.blue) * 0.131, 255)
+                
+                return Pixel(
+                    red: UInt8(red),
+                    green: UInt8(green),
+                    blue: UInt8(blue),
+                    alpha: pixel.alpha)
+            }),
+            width: rgbaImage.width,
+            height: rgbaImage.height)
     }
     
 }

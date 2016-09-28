@@ -8,14 +8,15 @@ public class ImageProcessor {
         static let all:[FilterType] = [Sepia, GrayScale, RedRose];
     }
     
-    public static func getFilter(filter:FilterType) -> Filter {
+    public static func getFilter(filter:String) -> Filter {
         switch filter {
-        case .GrayScale:
+        case FilterType.GrayScale.rawValue:
             return GrayScaleFilter.INSTANCE
-        case .Sepia:
+        case FilterType.Sepia.rawValue:
             return SepiaFilter.INSTANCE
-        case .RedRose:
+        case FilterType.RedRose.rawValue:
             return EnhancedRedFilter()
+        default: return NoopFilter.INSTANCE
         }
     }
     

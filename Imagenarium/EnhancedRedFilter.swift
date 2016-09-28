@@ -22,23 +22,20 @@ public class EnhancedRedFilter: Filter {
         self.level = level;
     }
     
-    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
-       
+    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
         let avgRed = ImageProcessor.getAvgColors(rgbaImage).R
-        
-        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
-            
-            let redDiff = Int(pixel.red) - avgRed
-            
-            return Pixel(
-                red: redDiff > 0 ?
-                    UInt8(max(0, min(255, avgRed + redDiff * level))) : pixel.red,
-                green: pixel.green,
-                blue: pixel.blue,
-                alpha: pixel.alpha)
-        })
-        
-        return rgbaImage
+        return RGBAImage(
+            pixels: rgbaImage.pixels.map({ pixel -> Pixel in
+                let redDiff = Int(pixel.red) - avgRed
+                return Pixel(
+                    red: redDiff > 0 ?
+                        UInt8(max(0, min(255, avgRed + redDiff * level))) : pixel.red,
+                    green: pixel.green,
+                    blue: pixel.blue,
+                    alpha: pixel.alpha)
+            }),
+            width: rgbaImage.width,
+            height: rgbaImage.height)
     }
     
 }

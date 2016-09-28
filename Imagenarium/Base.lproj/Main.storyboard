@@ -52,7 +52,7 @@
                                                             </mask>
                                                         </variation>
                                                         <connections>
-                                                            <action selector="onFilter:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="HOH-zg-pMU"/>
+                                                            <action selector="onFilterMenu:" destination="BYZ-38-t0r" eventType="primaryActionTriggered" id="TbU-Nd-fCH"/>
                                                         </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="j4h-ny-RaT">

@@ -1,6 +1,6 @@
 import Foundation
 
-public class FilterChain: Filter {
+public class FilterChain {
     
     private var filters:[Filter] = []
     
@@ -11,19 +11,8 @@ public class FilterChain: Filter {
         return self
     }
     
-    public func doChain(inout rgbaImage:RGBAImage) -> RGBAImage {
-        filters.forEach{ (filter : Filter) -> () in
-            filter.apply(&rgbaImage)
-        }
-        return rgbaImage
-    }
-    
     public func clear() -> FilterChain {
         filters.removeAll()
         return self
-    }
-    
-    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
-        return doChain(&rgbaImage)
     }
 }

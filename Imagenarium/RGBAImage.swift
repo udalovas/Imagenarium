@@ -90,6 +90,10 @@ public struct RGBAImage {
         imageData.dealloc(width * height)
     }
     
+    public func clone() -> RGBAImage {
+        return RGBAImage(pixels: self.pixels, width: self.width, height: self.height)
+    }
+    
     public func toUIImage() -> UIImage? {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         var bitmapInfo: UInt32 = CGBitmapInfo.ByteOrder32Big.rawValue

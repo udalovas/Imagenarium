@@ -2,6 +2,6 @@ import Foundation
 
 public protocol Filter {
     
-    func apply(inout rgbaImage: RGBAImage) -> RGBAImage
+    func apply(rgbaImage: RGBAImage) -> RGBAImage
 }
 

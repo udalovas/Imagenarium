@@ -8,16 +8,17 @@ public class TransparancyFilter: Filter {
         self.alpha = alpha;
     }
     
-    public func apply(inout rgbaImage: RGBAImage) -> RGBAImage {
+    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
         
-        rgbaImage.pixels = rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
-            return Pixel(
-                red: pixel.alpha,
-                green: pixel.green,
-                blue: pixel.blue,
-                alpha: self.alpha)
-        })
-        
-        return rgbaImage
+        return RGBAImage(
+            pixels: rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
+                return Pixel(
+                    red: pixel.alpha,
+                    green: pixel.green,
+                    blue: pixel.blue,
+                    alpha: self.alpha)
+                }),
+            width: rgbaImage.width,
+            height: rgbaImage.height)
     }
 }
