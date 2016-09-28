@@ -175,6 +175,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         originalImage = UIImage(named: "default")
         originalRGBAImage = RGBAImage(image: originalImage!)
         
+        imageView.userInteractionEnabled = true
+        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
+        imageView.image = originalImage
+    }
+    
+    @IBAction func onImageTap(sender: UIImageView) {
         imageView.image = originalImage
     }
 }
