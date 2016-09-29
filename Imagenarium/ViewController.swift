@@ -1,6 +1,6 @@
 //
 //  ViewController.swift
-//  Filterer
+//  Imagenarium
 //
 //  Created by Алексей Удалов on 20/09/16.
 //  Copyright © 2016 udalovas. All rights reserved.
@@ -32,6 +32,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     private var filteredRGBAImage: RGBAImage?
     private var filteredImage: UIImage?
+    
+    /* Action! */
 
     @IBAction func onNewPhoto(sender: UIButton) {
         
@@ -49,15 +51,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         self.presentViewController(photoActionSheet, animated: true, completion: nil)
     }
     
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
-        dismissViewControllerAnimated(true, completion: nil)
-        imageView.image = (info[UIImagePickerControllerOriginalImage] as! UIImage)
-    }
-    
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        dismissViewControllerAnimated(true, completion: nil)
-    }
-    
     @IBAction func onShare(sender: UIButton) {
         let activityController = UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil)
         presentViewController(activityController, animated: true, completion: nil)
@@ -72,6 +65,39 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         sender.selected = !sender.selected
     }
     
+    @IBAction func onFilterTap(sender: UIButton) {
+        
+        if(sender.selected) {
+            imageView.image = originalImage
+        } else {
+            filterButtons
+                .filter { button -> Bool in
+                    button != sender
+                }.forEach { button in
+                    button.selected = false
+            }
+            filteredRGBAImage = ImageProcessor.getFilter(sender.currentTitle!).apply(originalRGBAImage!) // yes, the way to map buttons and filters is appealable here
+            filteredImage = filteredRGBAImage?.toUIImage()
+            imageView.image = filteredImage!
+        }
+        sender.selected = !sender.selected
+    }
+    
+    @IBAction func onImageTap(sender: UIImageView) {
+        imageView.image = originalImage
+    }
+    
+    /* UIImagePickerControllerDelegate: start */
+    
+    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
+        dismissViewControllerAnimated(true, completion: nil)
+        imageView.image = (info[UIImagePickerControllerOriginalImage] as! UIImage)
+    }
+    
+    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
+        dismissViewControllerAnimated(true, completion: nil)
+    }
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -82,7 +108,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+        // Dispose of any resources that can be recreated..
     }
     
     private func showCamera() {
@@ -135,25 +161,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         }
     }
     
-    func onFilterTap(sender: UIButton) {
-        
-        if(sender.selected) {
-            imageView.image = originalImage
-        } else {
-            // reset all neibours
-            filterButtons.filter { (button) -> Bool in
-                button != sender
-                }.forEach { (button) in
-                    button.selected = false
-                }
-            // apply new filter
-            filteredRGBAImage = ImageProcessor.getFilter(sender.currentTitle!).apply(originalRGBAImage!)
-            filteredImage = filteredRGBAImage?.toUIImage()
-            imageView.image = filteredImage!
-        }
-        sender.selected = !sender.selected
-    }
-    
     private func initFilterMenu() {
         
         secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
@@ -164,6 +171,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             let filterButton = UIButton(type: .System)
             filterButton.setTitle(filter.rawValue, forState: .Normal)
             filterButton.addTarget(self, action: #selector(ViewController.onFilterTap(_:)), forControlEvents: .TouchUpInside)
+            
+            let previewImage = ImageProcessor.getFilter(filter.rawValue).apply(originalRGBAImage!).toUIImage()
+            filterButton.setBackgroundImage(previewImage, forState: .Normal)
+            filterButton.adjustsImageWhenDisabled = true
             
             filtersContainer.addArrangedSubview(filterButton)
             filterButtons.append(filterButton)
@@ -179,9 +190,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
         imageView.image = originalImage
     }
-    
-    @IBAction func onImageTap(sender: UIImageView) {
-        imageView.image = originalImage
-    }
+
 }
 
