@@ -16,19 +16,35 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* Controls */
     
+    @IBOutlet var mainStackView: UIStackView!
+    @IBOutlet var originalImageView: UIImageView!
     @IBOutlet var newPhotoButton: UIButton!
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var secondaryMenu: UIView!
     @IBOutlet var filtersContainer: UIStackView!
     @IBOutlet var bottomMenu: UIView!
     @IBOutlet var filterButton: UIButton!
+    @IBOutlet var compareButton: UIButton!
     
     private var filterButtons:[UIButton] = []
     
     /* State */
     
     private var originalRGBAImage: RGBAImage?
-    private var originalImage: UIImage?
+    
+    private var originalImage: UIImage? {
+        get {
+            return self.originalImage
+        }
+        set(newOriginalImage) {
+            
+            self.originalImage = newOriginalImage
+            self.originalRGBAImage = RGBAImage(image: newOriginalImage!)
+            
+            imageView.image = originalImage
+            originalImageView.image = originalImage
+        }
+    }
     
     private var filteredRGBAImage: RGBAImage?
     private var filteredImage: UIImage?
@@ -69,6 +85,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         if(sender.selected) {
             imageView.image = originalImage
+            compareButton.enabled = false
         } else {
             filterButtons
                 .filter { button -> Bool in
@@ -76,6 +93,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                 }.forEach { button in
                     button.selected = false
             }
+            compareButton.enabled = true
             filteredRGBAImage = ImageProcessor.getFilter(sender.currentTitle!).apply(originalRGBAImage!) // yes, the way to map buttons and filters is appealable here
             filteredImage = filteredRGBAImage?.toUIImage()
             imageView.image = filteredImage!
@@ -91,7 +109,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         dismissViewControllerAnimated(true, completion: nil)
-        imageView.image = (info[UIImagePickerControllerOriginalImage] as! UIImage)
+        originalImage = (info[UIImagePickerControllerOriginalImage] as! UIImage)
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
@@ -103,6 +121,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         super.viewDidLoad()
         
         initImage()
+        initCompareButton()
         initFilterMenu()
     }
 
@@ -111,6 +130,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         // Dispose of any resources that can be recreated..
     }
     
+    @IBAction func onCompareTouchDown(sender: UIButton) {
+        if(sender.selected) {
+            hideOriginalOverlay()
+        } else {
+            showOriginalOverlay()
+        }
+        sender.selected = !sender.selected
+    }
     private func showCamera() {
         
         let imagePicker = UIImagePickerController()
@@ -118,6 +145,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         imagePicker.sourceType = .Camera
         
         self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    private func initCompareButton() {
+        compareButton.enabled = false
     }
     
     private func showAlbum() {
@@ -148,6 +179,38 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
             self.secondaryMenu.alpha = 1
         }
+    }
+    
+    func hideOriginalOverlay() {
+        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION, animations: {
+            self.originalImageView.alpha = 0
+        }) { completed in
+            if(completed == true) {
+                self.originalImageView.removeFromSuperview()
+            }
+        }
+    }
+    
+    func showOriginalOverlay() {
+        
+        view.addSubview(originalImageView)
+        
+        // TODO: check that we really need to calculate constraints each time..
+        
+        let topConstraint = originalImageView.topAnchor.constraintEqualToAnchor(mainStackView.topAnchor)
+        let bottomConstraint = originalImageView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
+        let leftConstraint = originalImageView.leftAnchor.constraintEqualToAnchor(mainStackView.leftAnchor)
+        let rightConstraint = originalImageView.rightAnchor.constraintEqualToAnchor(mainStackView.rightAnchor)
+        
+        NSLayoutConstraint.activateConstraints([topConstraint, leftConstraint, rightConstraint, bottomConstraint])
+        
+        view.layoutIfNeeded()
+        
+        self.originalImageView.alpha = 0
+        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
+            self.originalImageView.alpha = 1
+        }
+        
     }
     
     private func hideSecondaryMenu () {
@@ -189,6 +252,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         imageView.userInteractionEnabled = true
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
         imageView.image = originalImage
+        
+        originalImageView.translatesAutoresizingMaskIntoConstraints = false
+        originalImageView.image = originalImage
     }
 
 }

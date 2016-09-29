@@ -67,6 +67,9 @@
                                                                 <exclude reference="dam-Fi-h9w"/>
                                                             </mask>
                                                         </variation>
+                                                        <connections>
+                                                            <action selector="onCompareTouchDown:" destination="BYZ-38-t0r" eventType="touchDown" id="2Is-aW-Zyz"/>
+                                                        </connections>
                                                     </button>
                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yID-zX-GBh">
                                                         <rect key="frame" x="450" y="0.0" width="150" height="44"/>
@@ -113,10 +116,13 @@
                     </view>
                     <connections>
                         <outlet property="bottomMenu" destination="8kH-P7-39w" id="xjB-0M-A3V"/>
+                        <outlet property="compareButton" destination="j4h-ny-RaT" id="UVr-D9-o5m"/>
                         <outlet property="filterButton" destination="si7-GY-Tod" id="x6g-W0-Rp8"/>
                         <outlet property="filtersContainer" destination="9gI-vQ-N4J" id="dvI-Z2-btT"/>
                         <outlet property="imageView" destination="qoN-Ng-MGG" id="Anm-dN-tsf"/>
+                        <outlet property="mainStackView" destination="fLt-Q1-LWk" id="nP8-6Z-dWt"/>
                         <outlet property="newPhotoButton" destination="7fF-C1-Lal" id="qGh-vp-rqr"/>
+                        <outlet property="originalImageView" destination="pWa-AU-nKx" id="WUa-vX-DrJ"/>
                         <outlet property="secondaryMenu" destination="up8-68-jJa" id="1G9-Zd-chb"/>
                     </connections>
                 </viewController>
@@ -137,6 +143,11 @@
                         <constraint firstAttribute="bottom" secondItem="9gI-vQ-N4J" secondAttribute="bottom" id="hrX-pO-UQg"/>
                     </constraints>
                 </view>
+                <imageView contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="pWa-AU-nKx" userLabel="Original Image View">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </imageView>
             </objects>
             <point key="canvasLocation" x="242" y="-123"/>
         </scene>
