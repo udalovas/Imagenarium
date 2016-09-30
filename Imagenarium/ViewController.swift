@@ -264,7 +264,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         originalImage = image
         originalRGBAImage = RGBAImage(image: image)
         
-        originalImageView.image = originalImage
+        originalImageView.image = ImageProcessor.drawText("Original", inImage: originalImage!, atPoint: CGPointMake(20, 20))
         imageView.image = originalImage
         setPreviewImage()
     }

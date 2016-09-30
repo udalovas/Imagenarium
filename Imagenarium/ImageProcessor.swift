@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 public class ImageProcessor {
     
@@ -27,5 +27,25 @@ public class ImageProcessor {
         }
         
         return (total.0/rgbaImage.pixels.count, total.1/rgbaImage.pixels.count, total.2/rgbaImage.pixels.count)
+    }
+    
+    public static func drawText(text: NSString, inImage: UIImage, atPoint: CGPoint) -> UIImage{
+        
+        UIGraphicsBeginImageContextWithOptions(inImage.size, false, UIScreen.mainScreen().scale)
+        
+        inImage.drawInRect(CGRectMake(0, 0, inImage.size.width, inImage.size.height))
+        
+        let rect = CGRectMake(atPoint.x, atPoint.y, inImage.size.width, inImage.size.height)
+        
+        text.drawInRect(rect, withAttributes: [
+            NSFontAttributeName: UIFont(name: "Helvetica Bold", size: 14)!,
+            NSForegroundColorAttributeName: UIColor.whiteColor(),
+        ])
+        
+        let result = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return result
     }
 }
