@@ -18,33 +18,22 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @IBOutlet var mainStackView: UIStackView!
     @IBOutlet var originalImageView: UIImageView!
-    @IBOutlet var newPhotoButton: UIButton!
     @IBOutlet var imageView: UIImageView!
+    
     @IBOutlet var secondaryMenu: UIView!
     @IBOutlet var filtersContainer: UIStackView!
+    
     @IBOutlet var bottomMenu: UIView!
     @IBOutlet var filterButton: UIButton!
     @IBOutlet var compareButton: UIButton!
+    @IBOutlet var newPhotoButton: UIButton!
     
     private var filterButtons:[UIButton] = []
     
     /* State */
     
     private var originalRGBAImage: RGBAImage?
-    
-    private var originalImage: UIImage? {
-        get {
-            return self.originalImage
-        }
-        set(newOriginalImage) {
-            
-            self.originalImage = newOriginalImage
-            self.originalRGBAImage = RGBAImage(image: newOriginalImage!)
-            
-            imageView.image = originalImage
-            originalImageView.image = originalImage
-        }
-    }
+    private var originalImage: UIImage?
     
     private var filteredRGBAImage: RGBAImage?
     private var filteredImage: UIImage?
@@ -52,6 +41,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* Action! */
 
     @IBAction func onNewPhoto(sender: UIButton) {
+        
+        // TODO need to create each time?..
         
         let photoActionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .ActionSheet)
         
@@ -68,8 +59,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     @IBAction func onShare(sender: UIButton) {
-        let activityController = UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil)
-        presentViewController(activityController, animated: true, completion: nil)
+        presentViewController(UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil),
+                              animated: true,
+                              completion: nil)
     }
     
     @IBAction func onFilterMenu(sender: UIButton) {
@@ -87,6 +79,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             imageView.image = originalImage
             compareButton.enabled = false
         } else {
+            // state
+            filteredRGBAImage = RGBAImage(image: sender.currentBackgroundImage!)
+            filteredImage = sender.currentBackgroundImage
+            // view
             filterButtons
                 .filter { button -> Bool in
                     button != sender
@@ -94,33 +90,33 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
                     button.selected = false
             }
             compareButton.enabled = true
-            filteredRGBAImage = ImageProcessor.getFilter(sender.currentTitle!).apply(originalRGBAImage!) // yes, the way to map buttons and filters is appealable here
-            filteredImage = filteredRGBAImage?.toUIImage()
-            imageView.image = filteredImage!
+            imageView.image = sender.currentBackgroundImage
         }
         sender.selected = !sender.selected
     }
     
     @IBAction func onImageTap(sender: UIImageView) {
-        imageView.image = originalImage
+        imageView.image = originalImage // TODO test on device
     }
     
     /* UIImagePickerControllerDelegate: start */
     
     func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : AnyObject]) {
         dismissViewControllerAnimated(true, completion: nil)
-        originalImage = (info[UIImagePickerControllerOriginalImage] as! UIImage)
+        updateOriginalImage(info[UIImagePickerControllerOriginalImage] as! UIImage)
     }
     
     func imagePickerControllerDidCancel(picker: UIImagePickerController) {
         dismissViewControllerAnimated(true, completion: nil)
     }
     
+    /* UIImagePickerControllerDelegate: end */
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
         
-        initImage()
+        initImageViews()
         initCompareButton()
         initFilterMenu()
     }
@@ -138,6 +134,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         }
         sender.selected = !sender.selected
     }
+    
     private func showCamera() {
         
         let imagePicker = UIImagePickerController()
@@ -147,10 +144,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         self.presentViewController(imagePicker, animated: true, completion: nil)
     }
     
-    private func initCompareButton() {
-        compareButton.enabled = false
-    }
-    
     private func showAlbum() {
         
         let imagePicker = UIImagePickerController()
@@ -158,6 +151,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         imagePicker.sourceType = .PhotoLibrary
         
         self.presentViewController(imagePicker, animated: true, completion: nil)
+    }
+    
+    private func initCompareButton() {
+        compareButton.enabled = false
     }
     
     func showSecondaryMenu() {
@@ -210,7 +207,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
             self.originalImageView.alpha = 1
         }
-        
     }
     
     private func hideSecondaryMenu () {
@@ -234,27 +230,43 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             let filterButton = UIButton(type: .System)
             filterButton.setTitle(filter.rawValue, forState: .Normal)
             filterButton.addTarget(self, action: #selector(ViewController.onFilterTap(_:)), forControlEvents: .TouchUpInside)
-            
-            let previewImage = ImageProcessor.getFilter(filter.rawValue).apply(originalRGBAImage!).toUIImage()
-            filterButton.setBackgroundImage(previewImage, forState: .Normal)
             filterButton.adjustsImageWhenDisabled = true
             
             filtersContainer.addArrangedSubview(filterButton)
             filterButtons.append(filterButton)
         }
+        
+        setPreviewImage()
     }
     
-    private func initImage() {
+    private func setPreviewImage() {
         
-        originalImage = UIImage(named: "default")
-        originalRGBAImage = RGBAImage(image: originalImage!)
+        filterButtons.forEach { button in
+            let previewImage = ImageProcessor.getFilter(button.currentTitle!).apply(originalRGBAImage!).toUIImage()
+            button.setBackgroundImage(previewImage, forState: .Normal)
+        }
+    }
+    
+    private func initImageViews() {
+        
+        updateOriginalImage(UIImage(named: "default")!)
         
         imageView.userInteractionEnabled = true
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
         imageView.image = originalImage
         
         originalImageView.translatesAutoresizingMaskIntoConstraints = false
+        
+    }
+    
+    private func updateOriginalImage(image: UIImage) {
+        
+        originalImage = image
+        originalRGBAImage = RGBAImage(image: image)
+        
         originalImageView.image = originalImage
+        imageView.image = originalImage
+        setPreviewImage()
     }
 
 }
