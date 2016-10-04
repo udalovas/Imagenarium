@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
     
     /* Constants */
     
@@ -22,6 +22,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @IBOutlet var secondaryMenu: UIView!
     @IBOutlet var filtersContainer: UIStackView!
+    
+    @IBOutlet var filtersCollectionView: UICollectionView!
     
     @IBOutlet var bottomMenu: UIView!
     @IBOutlet var filterButton: UIButton!
@@ -66,9 +68,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @IBAction func onFilterMenu(sender: UIButton) {
         if(!sender.selected) {
-            showSecondaryMenu()
+//            showSecondaryMenu()
+            showFiltersCollection()
         } else {
-            hideSecondaryMenu()
+//            hideSecondaryMenu()
+            hide(filtersCollectionView)
         }
         sender.selected = !sender.selected
     }
@@ -112,6 +116,26 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* UIImagePickerControllerDelegate: end */
     
+    /* UICollectionViewDataSource */
+    
+    let fakeFilters = ["RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia"]
+    
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return fakeFilters.count
+    }
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = filtersCollectionView.dequeueReusableCellWithReuseIdentifier("FilterCell", forIndexPath: indexPath)
+//        cell.backgroundColor = UIColor.blueColor()
+        return cell
+    }
+    
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+        print("filterIsSelected " + String(indexPath.row))
+    }
+    
+    /* UICollectionViewDataSource: end */
+    
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -119,6 +143,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         initImageViews()
         initCompareButton()
         initFilterMenu()
+        
+        filtersCollectionView.dataSource = self
+        filtersCollectionView.delegate = self
+        filtersCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        filtersCollectionView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -178,21 +208,37 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         }
     }
     
-    func hideOriginalOverlay() {
-        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION, animations: {
-            self.originalImageView.alpha = 0
-        }) { completed in
-            if(completed == true) {
-                self.originalImageView.removeFromSuperview()
-            }
+    func showFiltersCollection() {
+        
+        view.addSubview(filtersCollectionView)
+        
+        // TODO: check that we really need to calculate constraints each time..
+        
+        let bottomConstraint = filtersCollectionView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
+        let leftConstraint = filtersCollectionView.leftAnchor.constraintEqualToAnchor(bottomMenu.leftAnchor)
+        let rightConstraint = filtersCollectionView.rightAnchor.constraintEqualToAnchor(bottomMenu.rightAnchor)
+        let heightConstraint = filtersCollectionView.heightAnchor.constraintEqualToConstant(50)
+        
+        NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
+        
+        view.layoutIfNeeded()
+        
+        self.filtersCollectionView.alpha = 0
+        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
+            self.filtersCollectionView.alpha = 1
         }
     }
     
+    func hideFiltersCollection() {
+        hide(filtersCollectionView)
+    }
+    
+    func hideOriginalOverlay() {
+        hide(originalImageView)
+    }
+    
     func showOriginalOverlay() {
-        
         view.addSubview(originalImageView)
-        
-        // TODO: check that we really need to calculate constraints each time..
         
         let topConstraint = originalImageView.topAnchor.constraintEqualToAnchor(mainStackView.topAnchor)
         let bottomConstraint = originalImageView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
@@ -203,20 +249,27 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         
         view.layoutIfNeeded()
         
-        self.originalImageView.alpha = 0
-        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
-            self.originalImageView.alpha = 1
-        }
+        show(originalImageView)
     }
     
     private func hideSecondaryMenu () {
-        
+        hide(secondaryMenu)
+    }
+    
+    private func hide(view: UIView) {
         UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION, animations: {
-            self.secondaryMenu.alpha = 0
+            view.alpha = 0
         }) { completed in
             if(completed == true) {
-                self.secondaryMenu.removeFromSuperview()
+                view.removeFromSuperview()
             }
+        }
+    }
+    
+    private func show(view: UIView) {
+        view.alpha = 0
+        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
+            view.alpha = 1
         }
     }
     
