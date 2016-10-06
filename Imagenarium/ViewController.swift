@@ -13,41 +13,31 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* Constants */
     
     private static let FADE_ANIMATION_DURATION:NSTimeInterval = 0.4
+    private static let FILTER_MENU_HEIGHT:UInt8 = 50
     
     /* Controls */
     
     @IBOutlet var mainStackView: UIStackView!
     @IBOutlet var originalImageView: UIImageView!
     @IBOutlet var imageView: UIImageView!
-    
-    @IBOutlet var secondaryMenu: UIView!
-    @IBOutlet var filtersContainer: UIStackView!
-    
     @IBOutlet var filtersCollectionView: UICollectionView!
-    
     @IBOutlet var bottomMenu: UIView!
     @IBOutlet var filterButton: UIButton!
     @IBOutlet var compareButton: UIButton!
     @IBOutlet var newPhotoButton: UIButton!
     
-    private var filterButtons:[UIButton] = []
-    
     /* State */
     
     private var originalRGBAImage: RGBAImage?
     private var originalImage: UIImage?
-    
     private var filteredRGBAImage: RGBAImage?
     private var filteredImage: UIImage?
     
     /* Action! */
 
     @IBAction func onNewPhoto(sender: UIButton) {
-        
         // TODO need to create each time?..
-        
         let photoActionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .ActionSheet)
-        
         photoActionSheet.popoverPresentationController?.sourceView = newPhotoButton
         photoActionSheet.addAction(UIAlertAction(title: "Camera", style: .Default, handler: { action in
             self.showCamera()
@@ -56,48 +46,43 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             self.showAlbum()
         }))
         photoActionSheet.addAction(UIAlertAction(title: "Cancel", style: .Cancel, handler: nil))
-        
         self.presentViewController(photoActionSheet, animated: true, completion: nil)
     }
     
     @IBAction func onShare(sender: UIButton) {
-        presentViewController(UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil),
-                              animated: true,
-                              completion: nil)
+        presentViewController(UIActivityViewController(activityItems: [imageView.image!], applicationActivities: nil), animated: true, completion: nil)
     }
     
     @IBAction func onFilterMenu(sender: UIButton) {
         if(!sender.selected) {
-//            showSecondaryMenu()
             showFiltersCollection()
         } else {
-//            hideSecondaryMenu()
             hide(filtersCollectionView)
         }
         sender.selected = !sender.selected
     }
     
-    @IBAction func onFilterTap(sender: UIButton) {
-        
-        if(sender.selected) {
-            imageView.image = originalImage
-            compareButton.enabled = false
-        } else {
-            // state
-            filteredRGBAImage = RGBAImage(image: sender.currentBackgroundImage!)
-            filteredImage = sender.currentBackgroundImage
-            // view
-            filterButtons
-                .filter { button -> Bool in
-                    button != sender
-                }.forEach { button in
-                    button.selected = false
-            }
-            compareButton.enabled = true
-            imageView.image = sender.currentBackgroundImage
-        }
-        sender.selected = !sender.selected
-    }
+//    @IBAction func onFilterTap(sender: UIButton) {
+//        
+//        if(sender.selected) {
+//            imageView.image = originalImage
+//            compareButton.enabled = false
+//        } else {
+//            // state
+//            filteredRGBAImage = RGBAImage(image: sender.currentBackgroundImage!)
+//            filteredImage = sender.currentBackgroundImage
+//            // view
+//            filterButtons
+//                .filter { button -> Bool in
+//                    button != sender
+//                }.forEach { button in
+//                    button.selected = false
+//            }
+//            compareButton.enabled = true
+//            imageView.image = sender.currentBackgroundImage
+//        }
+//        sender.selected = !sender.selected
+//    }
     
     @IBAction func onImageTap(sender: UIImageView) {
         imageView.image = originalImage // TODO test on device
@@ -118,15 +103,17 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* UICollectionViewDataSource */
     
-    let fakeFilters = ["RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia", "RedRose", "GrayScale", "Sepia"]
-    
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return fakeFilters.count
+        return ImageProcessor.FilterType.all.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        let cell = filtersCollectionView.dequeueReusableCellWithReuseIdentifier("FilterCell", forIndexPath: indexPath)
-//        cell.backgroundColor = UIColor.blueColor()
+        let cell = filtersCollectionView.dequeueReusableCellWithReuseIdentifier("FilterCell", forIndexPath: indexPath) as! FilterCellView
+        // compress before?
+        let image = ImageProcessor.getFilter(ImageProcessor.FilterType.all[indexPath.row].rawValue).apply(originalRGBAImage!).toUIImage()
+        cell.labelView.text = ImageProcessor.FilterType.all[indexPath.row].rawValue
+        cell.imageView.image = image
+        cell.layoutIfNeeded()
         return cell
     }
     
@@ -137,18 +124,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource: end */
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        
         initImageViews()
         initCompareButton()
         initFilterMenu()
-        
-        filtersCollectionView.dataSource = self
-        filtersCollectionView.delegate = self
-        filtersCollectionView.translatesAutoresizingMaskIntoConstraints = false
-        filtersCollectionView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
-        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -166,20 +145,16 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     private func showCamera() {
-        
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .Camera
-        
         self.presentViewController(imagePicker, animated: true, completion: nil)
     }
     
     private func showAlbum() {
-        
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
         imagePicker.sourceType = .PhotoLibrary
-        
         self.presentViewController(imagePicker, animated: true, completion: nil)
     }
     
@@ -187,46 +162,18 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         compareButton.enabled = false
     }
     
-    func showSecondaryMenu() {
-        
-        view.addSubview(secondaryMenu)
-        
-        // TODO: check that we really need to calculate constraints each time..
-        
-        let bottomConstraint = secondaryMenu.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
-        let leftConstraint = secondaryMenu.leftAnchor.constraintEqualToAnchor(bottomMenu.leftAnchor)
-        let rightConstraint = secondaryMenu.rightAnchor.constraintEqualToAnchor(bottomMenu.rightAnchor)
-        let heightConstraint = secondaryMenu.heightAnchor.constraintEqualToConstant(44)
-        
-        NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
-        
-        view.layoutIfNeeded()
-        
-        self.secondaryMenu.alpha = 0
-        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
-            self.secondaryMenu.alpha = 1
-        }
-    }
-    
     func showFiltersCollection() {
         
         view.addSubview(filtersCollectionView)
         
-        // TODO: check that we really need to calculate constraints each time..
-        
         let bottomConstraint = filtersCollectionView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
         let leftConstraint = filtersCollectionView.leftAnchor.constraintEqualToAnchor(bottomMenu.leftAnchor)
         let rightConstraint = filtersCollectionView.rightAnchor.constraintEqualToAnchor(bottomMenu.rightAnchor)
-        let heightConstraint = filtersCollectionView.heightAnchor.constraintEqualToConstant(50)
-        
+        let heightConstraint = filtersCollectionView.heightAnchor.constraintEqualToConstant(CGFloat(ViewController.FILTER_MENU_HEIGHT))
         NSLayoutConstraint.activateConstraints([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
-        
         view.layoutIfNeeded()
         
-        self.filtersCollectionView.alpha = 0
-        UIView.animateWithDuration(ViewController.FADE_ANIMATION_DURATION) {
-            self.filtersCollectionView.alpha = 1
-        }
+        show(filtersCollectionView)
     }
     
     func hideFiltersCollection() {
@@ -239,21 +186,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func showOriginalOverlay() {
         view.addSubview(originalImageView)
-        
         let topConstraint = originalImageView.topAnchor.constraintEqualToAnchor(mainStackView.topAnchor)
         let bottomConstraint = originalImageView.bottomAnchor.constraintEqualToAnchor(bottomMenu.topAnchor)
         let leftConstraint = originalImageView.leftAnchor.constraintEqualToAnchor(mainStackView.leftAnchor)
         let rightConstraint = originalImageView.rightAnchor.constraintEqualToAnchor(mainStackView.rightAnchor)
-        
         NSLayoutConstraint.activateConstraints([topConstraint, leftConstraint, rightConstraint, bottomConstraint])
-        
         view.layoutIfNeeded()
-        
         show(originalImageView)
-    }
-    
-    private func hideSecondaryMenu () {
-        hide(secondaryMenu)
     }
     
     private func hide(view: UIView) {
@@ -274,52 +213,30 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     private func initFilterMenu() {
-        
-        secondaryMenu.translatesAutoresizingMaskIntoConstraints = false
-        secondaryMenu.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
-        
-        for filter in ImageProcessor.FilterType.all {
-            
-            let filterButton = UIButton(type: .System)
-            filterButton.setTitle(filter.rawValue, forState: .Normal)
-            filterButton.addTarget(self, action: #selector(ViewController.onFilterTap(_:)), forControlEvents: .TouchUpInside)
-            filterButton.adjustsImageWhenDisabled = true
-            
-            filtersContainer.addArrangedSubview(filterButton)
-            filterButtons.append(filterButton)
-        }
-        
-        setPreviewImage()
-    }
-    
-    private func setPreviewImage() {
-        
-        filterButtons.forEach { button in
-            let previewImage = ImageProcessor.getFilter(button.currentTitle!).apply(originalRGBAImage!).toUIImage()
-            button.setBackgroundImage(previewImage, forState: .Normal)
-        }
+        filtersCollectionView.dataSource = self
+        filtersCollectionView.delegate = self
+        filtersCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        filtersCollectionView.backgroundColor = UIColor.whiteColor().colorWithAlphaComponent(0.5)
+        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
     }
     
     private func initImageViews() {
-        
         updateOriginalImage(UIImage(named: "default")!)
-        
         imageView.userInteractionEnabled = true
         imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
         imageView.image = originalImage
-        
         originalImageView.translatesAutoresizingMaskIntoConstraints = false
-        
     }
     
     private func updateOriginalImage(image: UIImage) {
-        
         originalImage = image
         originalRGBAImage = RGBAImage(image: image)
-        
         originalImageView.image = ImageProcessor.drawText("Original", inImage: originalImage!, atPoint: CGPointMake(20, 20))
         imageView.image = originalImage
-        setPreviewImage()
+    }
+    
+    private func refreshPreview() {
+        // nothing at the moment
     }
 
 }

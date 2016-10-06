@@ -119,31 +119,13 @@
                         <outlet property="compareButton" destination="j4h-ny-RaT" id="UVr-D9-o5m"/>
                         <outlet property="filterButton" destination="si7-GY-Tod" id="x6g-W0-Rp8"/>
                         <outlet property="filtersCollectionView" destination="f1r-nx-eqN" id="8jR-9i-KZ4"/>
-                        <outlet property="filtersContainer" destination="9gI-vQ-N4J" id="dvI-Z2-btT"/>
                         <outlet property="imageView" destination="qoN-Ng-MGG" id="Anm-dN-tsf"/>
                         <outlet property="mainStackView" destination="fLt-Q1-LWk" id="nP8-6Z-dWt"/>
                         <outlet property="newPhotoButton" destination="7fF-C1-Lal" id="qGh-vp-rqr"/>
                         <outlet property="originalImageView" destination="pWa-AU-nKx" id="WUa-vX-DrJ"/>
-                        <outlet property="secondaryMenu" destination="up8-68-jJa" id="1G9-Zd-chb"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <view contentMode="scaleToFill" id="up8-68-jJa" userLabel="Secondary Menu View">
-                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <subviews>
-                        <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="9gI-vQ-N4J" userLabel="Filters Container">
-                            <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
-                        </stackView>
-                    </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <constraints>
-                        <constraint firstItem="9gI-vQ-N4J" firstAttribute="top" secondItem="up8-68-jJa" secondAttribute="top" id="EgK-Gn-SuL"/>
-                        <constraint firstItem="9gI-vQ-N4J" firstAttribute="leading" secondItem="up8-68-jJa" secondAttribute="leading" id="Nrj-1O-V5b"/>
-                        <constraint firstAttribute="trailing" secondItem="9gI-vQ-N4J" secondAttribute="trailing" id="Po0-AR-HZQ"/>
-                        <constraint firstAttribute="bottom" secondItem="9gI-vQ-N4J" secondAttribute="bottom" id="hrX-pO-UQg"/>
-                    </constraints>
-                </view>
                 <imageView contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" id="pWa-AU-nKx" userLabel="Original Image View">
                     <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -153,32 +135,35 @@
                     <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="10" minimumInteritemSpacing="10" id="wAw-bz-UB3">
-                        <size key="itemSize" width="52" height="46"/>
+                        <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
                         <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                     </collectionViewFlowLayout>
                     <cells>
-                        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.5" contentMode="scaleAspectFit" semanticContentAttribute="forceLeftToRight" reuseIdentifier="FilterCell" id="tAW-cL-v98">
+                        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="FilterCell" id="rEn-BB-bTB" customClass="FilterCellView" customModule="Imagenarium" customModuleProvider="target">
                             <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                 <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="default" translatesAutoresizingMaskIntoConstraints="NO" id="Eak-Cd-4Fi">
-                                        <rect key="frame" x="10" y="5" width="30" height="30"/>
-                                    </imageView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="text" textAlignment="center" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2sE-gz-Zqv">
-                                        <rect key="frame" x="4" y="37" width="42" height="10"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wye-3s-rYY">
+                                        <rect key="frame" x="0.0" y="39" width="50" height="12"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="8"/>
                                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WzO-lV-WXa">
+                                        <rect key="frame" x="7" y="4" width="36" height="36"/>
+                                    </imageView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             </view>
-                            <size key="customSize" width="50" height="50"/>
+                            <connections>
+                                <outlet property="imageView" destination="WzO-lV-WXa" id="f41-5u-V6O"/>
+                                <outlet property="labelView" destination="Wye-3s-rYY" id="HUq-Pi-eeM"/>
+                            </connections>
                         </collectionViewCell>
                     </cells>
                 </collectionView>
@@ -186,7 +171,4 @@
             <point key="canvasLocation" x="242" y="-123"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="default" width="550" height="829"/>
-    </resources>
 </document>
