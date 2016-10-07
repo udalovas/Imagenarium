@@ -14,6 +14,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     private static let FADE_ANIMATION_DURATION:NSTimeInterval = 0.4
     private static let FILTER_MENU_HEIGHT:UInt8 = 50
+    private static let ORIGINAL_LABEL = "Original"
     
     /* Controls */
     
@@ -62,28 +63,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         sender.selected = !sender.selected
     }
     
-//    @IBAction func onFilterTap(sender: UIButton) {
-//        
-//        if(sender.selected) {
-//            imageView.image = originalImage
-//            compareButton.enabled = false
-//        } else {
-//            // state
-//            filteredRGBAImage = RGBAImage(image: sender.currentBackgroundImage!)
-//            filteredImage = sender.currentBackgroundImage
-//            // view
-//            filterButtons
-//                .filter { button -> Bool in
-//                    button != sender
-//                }.forEach { button in
-//                    button.selected = false
-//            }
-//            compareButton.enabled = true
-//            imageView.image = sender.currentBackgroundImage
-//        }
-//        sender.selected = !sender.selected
-//    }
-    
     @IBAction func onImageTap(sender: UIImageView) {
         imageView.image = originalImage // TODO test on device
     }
@@ -104,21 +83,35 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource */
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return ImageProcessor.FilterType.all.count
+        return ImageProcessor.FilterType.all.count + 1 // +1 for original image cell
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = filtersCollectionView.dequeueReusableCellWithReuseIdentifier("FilterCell", forIndexPath: indexPath) as! FilterCellView
-        // compress before?
-        let image = ImageProcessor.getFilter(ImageProcessor.FilterType.all[indexPath.row].rawValue).apply(originalRGBAImage!).toUIImage()
-        cell.labelView.text = ImageProcessor.FilterType.all[indexPath.row].rawValue
-        cell.imageView.image = image
-        cell.layoutIfNeeded()
+        if(indexPath.row == 0) {
+            cell.labelView.text = ViewController.ORIGINAL_LABEL
+            cell.imageView.image = originalImage
+        } else {
+            // compress before?
+            let filterKey = ImageProcessor.FilterType.all[indexPath.row - 1].rawValue
+            cell.labelView.text = filterKey
+            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(originalRGBAImage!).toUIImage()
+        }
         return cell
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        print("filterIsSelected " + String(indexPath.row))
+        if(indexPath.row == 0) {
+            imageView.image = originalImage
+        } else {
+            imageView.image = ImageProcessor
+                .getFilter(ImageProcessor.FilterType.all[indexPath.row - 1].rawValue)
+                .apply(originalRGBAImage!).toUIImage()
+        }
+    }
+    
+    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+        imageView.image = originalImage
     }
     
     /* UICollectionViewDataSource: end */
@@ -231,7 +224,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     private func updateOriginalImage(image: UIImage) {
         originalImage = image
         originalRGBAImage = RGBAImage(image: image)
-        originalImageView.image = ImageProcessor.drawText("Original", inImage: originalImage!, atPoint: CGPointMake(20, 20))
+        originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPointMake(20, 20))
         imageView.image = originalImage
     }
     

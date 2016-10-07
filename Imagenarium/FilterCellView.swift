@@ -12,4 +12,10 @@ public class FilterCellView: UICollectionViewCell {
     
     @IBOutlet public var imageView: UIImageView!
     @IBOutlet public var labelView: UILabel!
+    
+    override public var selected: Bool {
+        didSet {
+            self.backgroundColor = selected ? UIColor.grayColor().colorWithAlphaComponent(0.5) : nil
+        }
+    }
 }
