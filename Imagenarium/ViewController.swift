@@ -226,14 +226,17 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     private func updateOriginalImage(image: UIImage) {
+        
         originalImage = image
         originalRGBAImage = RGBAImage(image: image)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPointMake(20, 20))
         imageView.image = originalImage
+        
+        refreshFiltersPreview()
     }
     
-    private func refreshPreview() {
-        // nothing at the moment
+    private func refreshFiltersPreview() {
+        self.filtersCollectionView.reloadData()
     }
 
 }
