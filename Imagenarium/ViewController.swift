@@ -55,16 +55,22 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     @IBAction func onFilterMenu(sender: UIButton) {
-        if(!sender.selected) {
+        toggleFilterMenu(!sender.selected)
+    }
+    
+    private func toggleFilterMenu(on:Bool) {
+        if(on && !filterButton.selected) {
             showFiltersCollection()
-        } else {
+            filterButton.selected = true
+        } else if(!on && filterButton.selected) {
             hide(filtersCollectionView)
+            filterButton.selected = false
         }
-        sender.selected = !sender.selected
     }
     
     @IBAction func onImageTap(sender: UIImageView) {
-        imageView.image = originalImage // TODO test on device
+        // TODO onTouchDown > show original, onTouchUp > back
+//        imageView.image = originalImage
     }
     
     /* UIImagePickerControllerDelegate: start */
@@ -107,11 +113,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             imageView.image = ImageProcessor
                 .getFilter(ImageProcessor.FilterType.all[indexPath.row - 1].rawValue)
                 .apply(originalRGBAImage!).toUIImage()
+            compareButton.enabled = true
         }
-    }
-    
-    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
-        imageView.image = originalImage
     }
     
     /* UICollectionViewDataSource: end */
@@ -133,6 +136,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             hideOriginalOverlay()
         } else {
             showOriginalOverlay()
+            toggleFilterMenu(false)
         }
         sender.selected = !sender.selected
     }
