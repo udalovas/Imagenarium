@@ -15,6 +15,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     fileprivate static let FADE_ANIMATION_DURATION:TimeInterval = 0.4
     fileprivate static let FILTER_MENU_HEIGHT:UInt8 = 50
     fileprivate static let ORIGINAL_LABEL = "Original"
+    fileprivate static let SAMPLE_IMAGE: UIImage = UIImage(named: "default")!
+    fileprivate static let SAMPLE_RGBA_IMAGE: RGBAImage = RGBAImage(image: SAMPLE_IMAGE)!
     
     /* Controls */
     
@@ -29,8 +31,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* State */
     
-    fileprivate var originalRGBAImage: RGBAImage?
     fileprivate var originalImage: UIImage?
+    fileprivate var originalRGBAImage: RGBAImage?
     fileprivate var filteredImage: UIImage?
     
     /* Action! */
@@ -103,10 +105,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             cell.labelView.text = ViewController.ORIGINAL_LABEL
             cell.imageView.image = originalImage
         } else {
-            // compress before?
             let filterKey = ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue
             cell.labelView.text = filterKey
-            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(originalRGBAImage!).toUIImage()
+            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(ViewController.SAMPLE_RGBA_IMAGE).toUIImage()
         }
         return cell
     }
@@ -168,6 +169,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func showFiltersCollection() {
         view.addSubview(filtersCollectionView)
+        // really need to create all this constraints each time?..
         let bottomConstraint = filtersCollectionView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
         let leftConstraint = filtersCollectionView.leftAnchor.constraint(equalTo: bottomMenu.leftAnchor)
         let rightConstraint = filtersCollectionView.rightAnchor.constraint(equalTo: bottomMenu.rightAnchor)
@@ -222,19 +224,21 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     fileprivate func initImageViews() {
-        updateOriginalImage(UIImage(named: "default")!)
-        imageView.isUserInteractionEnabled = true
+        
+        updateOriginalImage(ViewController.SAMPLE_IMAGE)
         
         let pressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(ViewController.onImageTouch(_:)))
         pressRecognizer.minimumPressDuration = 0.1
         imageView.addGestureRecognizer(pressRecognizer)
         imageView.image = originalImage
+        imageView.isUserInteractionEnabled = true
+        
         originalImageView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     fileprivate func updateOriginalImage(_ image: UIImage) {
         originalImage = image
-        originalRGBAImage = RGBAImage(image: image)
+        originalRGBAImage = RGBAImage(image: originalImage!)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
         refreshFiltersPreview()
@@ -243,6 +247,5 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     fileprivate func refreshFiltersPreview() {
         self.filtersCollectionView.reloadData()
     }
-
 }
 
