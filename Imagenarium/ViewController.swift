@@ -31,7 +31,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     fileprivate var originalRGBAImage: RGBAImage?
     fileprivate var originalImage: UIImage?
-    fileprivate var filteredRGBAImage: RGBAImage?
     fileprivate var filteredImage: UIImage?
     
     /* Action! */
@@ -68,9 +67,15 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         }
     }
     
-    @IBAction func onImageTap(_ sender: UIImageView) {
-        // TODO onTouchDown > show original, onTouchUp > back
-//        imageView.image = originalImage
+    @IBAction func onImageTouch(_ sender: UILongPressGestureRecognizer) {
+        switch sender.state {
+        case .began:
+            imageView.image = originalImage
+        case .ended:
+            imageView.image = filteredImage
+        default:
+            break
+        }
     }
     
     /* UIImagePickerControllerDelegate: start */
@@ -108,11 +113,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         if((indexPath as NSIndexPath).row == 0) {
+            filteredImage = originalImage
             imageView.image = originalImage
         } else {
-            imageView.image = ImageProcessor
+            filteredImage = ImageProcessor
                 .getFilter(ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue)
                 .apply(originalRGBAImage!).toUIImage()
+            imageView.image = filteredImage
             compareButton.isEnabled = true
         }
     }
@@ -160,16 +167,13 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     func showFiltersCollection() {
-        
         view.addSubview(filtersCollectionView)
-        
         let bottomConstraint = filtersCollectionView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
         let leftConstraint = filtersCollectionView.leftAnchor.constraint(equalTo: bottomMenu.leftAnchor)
         let rightConstraint = filtersCollectionView.rightAnchor.constraint(equalTo: bottomMenu.rightAnchor)
         let heightConstraint = filtersCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(ViewController.FILTER_MENU_HEIGHT))
         NSLayoutConstraint.activate([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         view.layoutIfNeeded()
-        
         show(filtersCollectionView)
     }
     
@@ -220,18 +224,19 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     fileprivate func initImageViews() {
         updateOriginalImage(UIImage(named: "default")!)
         imageView.isUserInteractionEnabled = true
-        imageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(ViewController.onImageTap(_:))))
+        
+        let pressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(ViewController.onImageTouch(_:)))
+        pressRecognizer.minimumPressDuration = 0.1
+        imageView.addGestureRecognizer(pressRecognizer)
         imageView.image = originalImage
         originalImageView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     fileprivate func updateOriginalImage(_ image: UIImage) {
-        
         originalImage = image
         originalRGBAImage = RGBAImage(image: image)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
-        
         refreshFiltersPreview()
     }
     
