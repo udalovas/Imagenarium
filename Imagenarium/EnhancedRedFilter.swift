@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class EnhancedRedFilter: Filter {
+open class EnhancedRedFilter: Filter {
     
-    public static let DEFAULT_LEVEL:Int = 5;
+    open static let DEFAULT_LEVEL:Int = 5;
     
-    private let level:Int
+    fileprivate let level:Int
     
     public convenience init() {
         self.init(level: EnhancedRedFilter.DEFAULT_LEVEL)
@@ -22,7 +22,7 @@ public class EnhancedRedFilter: Filter {
         self.level = level;
     }
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         let avgRed = ImageProcessor.getAvgColors(rgbaImage).R
         return RGBAImage(
             pixels: rgbaImage.pixels.map({ pixel -> Pixel in

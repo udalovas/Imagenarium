@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class GrayScaleFilter: Filter {
+open class GrayScaleFilter: Filter {
     
-    public static let INSTANCE:Filter = GrayScaleFilter()
+    open static let INSTANCE:Filter = GrayScaleFilter()
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         return RGBAImage(
             pixels: rgbaImage.pixels.map({ pixel -> Pixel in
                 let gray = (Int(pixel.red) + Int(pixel.green) + Int(pixel.blue)) / 3

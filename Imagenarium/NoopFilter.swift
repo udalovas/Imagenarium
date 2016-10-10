@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class NoopFilter: Filter {
+open class NoopFilter: Filter {
     
-    public static let INSTANCE:Filter = NoopFilter()
+    open static let INSTANCE:Filter = NoopFilter()
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         return rgbaImage.clone()
     }
 }

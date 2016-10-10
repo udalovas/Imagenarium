@@ -8,14 +8,14 @@
 
 import UIKit
 
-public class FilterCellView: UICollectionViewCell {
+open class FilterCellView: UICollectionViewCell {
     
-    @IBOutlet public var imageView: UIImageView!
-    @IBOutlet public var labelView: UILabel!
+    @IBOutlet open var imageView: UIImageView!
+    @IBOutlet open var labelView: UILabel!
     
-    override public var selected: Bool {
+    override open var isSelected: Bool {
         didSet {
-            self.backgroundColor = selected ? UIColor.grayColor().colorWithAlphaComponent(0.5) : nil
+            self.backgroundColor = isSelected ? UIColor.gray.withAlphaComponent(0.5) : nil
         }
     }
 }

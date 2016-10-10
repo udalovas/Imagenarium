@@ -1,14 +1,14 @@
 import Foundation
 
-public class TransparancyFilter: Filter {
+open class TransparancyFilter: Filter {
     
-    private let alpha:UInt8
+    fileprivate let alpha:UInt8
     
     public init(alpha: UInt8) {
         self.alpha = alpha;
     }
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         
         return RGBAImage(
             pixels: rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in

@@ -8,11 +8,11 @@
 
 import Foundation
 
-public class SepiaFilter : Filter {
+open class SepiaFilter : Filter {
     
-    public static let INSTANCE:Filter = SepiaFilter()
+    open static let INSTANCE:Filter = SepiaFilter()
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         return RGBAImage(
             pixels: rgbaImage.pixels.map({ pixel -> Pixel in
                 

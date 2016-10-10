@@ -8,15 +8,15 @@
 
 import Foundation
 
-public class BrightnessFilter: Filter {
+open class BrightnessFilter: Filter {
     
-    private let level:Double
+    fileprivate let level:Double
     
     public init(level:Double) {
         self.level = level
     }
     
-    public func apply(rgbaImage: RGBAImage) -> RGBAImage {
+    open func apply(_ rgbaImage: RGBAImage) -> RGBAImage {
         return RGBAImage(
             pixels: rgbaImage.pixels.map({ (pixel:Pixel) -> Pixel in
                 return Pixel(

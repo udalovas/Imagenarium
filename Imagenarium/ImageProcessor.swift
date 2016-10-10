@@ -1,7 +1,7 @@
 import UIKit
 import ImageIO
 
-public class ImageProcessor {
+open class ImageProcessor {
     
     public enum FilterType: String {
         case Sepia, GrayScale, RedRose
@@ -9,7 +9,7 @@ public class ImageProcessor {
         static let all:[FilterType] = [Sepia, GrayScale, RedRose];
     }
     
-    public static func getFilter(filter:String) -> Filter {
+    open static func getFilter(_ filter:String) -> Filter {
         switch filter {
         case FilterType.GrayScale.rawValue:
             return GrayScaleFilter.INSTANCE
@@ -21,7 +21,7 @@ public class ImageProcessor {
         }
     }
     
-    public static func getAvgColors(rgbaImage:RGBAImage) -> (R: Int, G: Int, B: Int) {
+    open static func getAvgColors(_ rgbaImage:RGBAImage) -> (R: Int, G: Int, B: Int) {
         
         let total = rgbaImage.pixels.reduce((0, 0, 0)) { (accumulator: (Int, Int, Int), pixel) -> (Int, Int, Int) in
             return (accumulator.0 + Int(pixel.red), accumulator.1 + Int(pixel.green), accumulator.2 + Int(pixel.blue))
@@ -29,23 +29,23 @@ public class ImageProcessor {
         return (total.0/rgbaImage.pixels.count, total.1/rgbaImage.pixels.count, total.2/rgbaImage.pixels.count)
     }
     
-    public static func drawText(text: NSString, inImage: UIImage, atPoint: CGPoint) -> UIImage{
+    open static func drawText(_ text: String, inImage: UIImage, atPoint: CGPoint) -> UIImage{
         
-        UIGraphicsBeginImageContextWithOptions(inImage.size, false, UIScreen.mainScreen().scale)
+        UIGraphicsBeginImageContextWithOptions(inImage.size, false, UIScreen.main.scale)
         
-        inImage.drawInRect(CGRectMake(0, 0, inImage.size.width, inImage.size.height))
+        inImage.draw(in: CGRect(x: 0, y: 0, width: inImage.size.width, height: inImage.size.height))
         
-        let rect = CGRectMake(atPoint.x, atPoint.y, inImage.size.width, inImage.size.height)
+        let rect = CGRect(x: atPoint.x, y: atPoint.y, width: inImage.size.width, height: inImage.size.height)
         
-        text.drawInRect(rect, withAttributes: [
+        text.draw(in: rect, withAttributes: [
             NSFontAttributeName: UIFont(name: "Helvetica Bold", size: 14)!,
-            NSForegroundColorAttributeName: UIColor.whiteColor(),
+            NSForegroundColorAttributeName: UIColor.white,
         ])
         
         let result = UIGraphicsGetImageFromCurrentImageContext()
         
         UIGraphicsEndImageContext()
         
-        return result
+        return result!
     }
 }

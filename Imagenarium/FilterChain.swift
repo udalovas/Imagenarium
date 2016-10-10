@@ -1,17 +1,17 @@
 import Foundation
 
-public class FilterChain {
+open class FilterChain {
     
-    private var filters:[Filter] = []
+    fileprivate var filters:[Filter] = []
     
     public init() {}
     
-    public func addFilter(filter:Filter) -> FilterChain {
+    open func addFilter(_ filter:Filter) -> FilterChain {
         filters.append(filter);
         return self
     }
     
-    public func clear() -> FilterChain {
+    open func clear() -> FilterChain {
         filters.removeAll()
         return self
     }
