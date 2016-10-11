@@ -96,7 +96,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource */
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return ImageProcessor.FilterType.all.count + 1 // +1 for original image cell
+        return ImageProcessor.FilterType.all.count + 1 // +1 for an original image cell
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -107,7 +107,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         } else {
             let filterKey = ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue
             cell.labelView.text = filterKey
-            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(ViewController.SAMPLE_RGBA_IMAGE).toUIImage()
+            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(originalRGBAImage!).toUIImage()
         }
         return cell
     }
@@ -141,7 +141,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @IBAction func onCompareTouchDown(_ sender: UIButton) {
         if(sender.isSelected) {
-            hideOriginalOverlay()
+            hide(originalImageView)
         } else {
             showOriginalOverlay()
             toggleFilterMenu(false)
@@ -179,16 +179,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         show(filtersCollectionView)
     }
     
-    func hideFiltersCollection() {
-        hide(filtersCollectionView)
-    }
-    
-    func hideOriginalOverlay() {
-        hide(originalImageView)
-    }
-    
     func showOriginalOverlay() {
         view.addSubview(originalImageView)
+        // really need to create all this constraints each time?..
         let topConstraint = originalImageView.topAnchor.constraint(equalTo: mainStackView.topAnchor)
         let bottomConstraint = originalImageView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
         let leftConstraint = originalImageView.leftAnchor.constraint(equalTo: mainStackView.leftAnchor)
@@ -241,10 +234,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         originalRGBAImage = RGBAImage(image: originalImage!)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
-        refreshFiltersPreview()
-    }
-    
-    fileprivate func refreshFiltersPreview() {
         self.filtersCollectionView.reloadData()
     }
 }
