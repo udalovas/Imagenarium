@@ -221,7 +221,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         filtersCollectionView.delegate = self
         filtersCollectionView.translatesAutoresizingMaskIntoConstraints = false
         filtersCollectionView.backgroundColor = UIColor.white.withAlphaComponent(0.5)
-        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
+//        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
     }
     
     fileprivate func initImageViews() {
