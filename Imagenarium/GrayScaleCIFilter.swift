@@ -11,10 +11,10 @@ import CoreImage
 
 public class GrayScaleCIFilter: CIFilter {
     
-    private var kernel: CIKernel?
     var inputImage:CIImage?
     
-    let callback: CIKernelROICallback = {
+    private var kernel: CIKernel?
+    private let callback: CIKernelROICallback = {
         (index, rect) in
         return rect.insetBy(dx: -1, dy: -1)
     }
@@ -38,10 +38,6 @@ public class GrayScaleCIFilter: CIFilter {
     
     private func createKernel() -> CIColorKernel {
         let kernelString =
-//            "kernel vec4 chromaKey( __sample s) { \n" +
-//                "  float gray = (s.r + s.g + s.b) / 3;\n" +
-//                "  return vec4( s.r, s.g, s.b, s.a ); \n" +
-//            "}"
             "kernel vec4 chromaKey( __sample s) { \n" +
                 "  float gray = (s.r + s.g + s.b) / 3.0;\n" +
                 "  return vec4( gray, gray, gray, s.a ); \n" +

@@ -3,29 +3,23 @@ import ImageIO
 
 open class ImageProcessor {
     
-    public enum FilterType: String {
-        case Sepia, GrayScale, RedRose
-        
-        static let all:[FilterType] = [Sepia, GrayScale, RedRose];
-    }
+    open static let FILTERS:[String] = ["GrayScale", "CISepiaTone", "CIGaussianBlur", "CITwirlDistortion", "CIBumpDistortion", "CIPixellate", "CIUnsharpMask", "CIVignette"]
     
-    open static func getFilter(_ filter:String) -> Filter {
+    open static func getFilter(_ filter:String) -> CIFilter? {
         switch filter {
-        case FilterType.GrayScale.rawValue:
-            return GrayScaleFilter.INSTANCE
-        case FilterType.Sepia.rawValue:
-            return SepiaFilter.INSTANCE
-        case FilterType.RedRose.rawValue:
-            return EnhancedRedFilter()
-        default: return NoopFilter.INSTANCE
+        case "GrayScale":
+            return GrayScaleCIFilter()
+        default:
+            return CIFilter(name: filter)
         }
     }
     
-    open static func getAvgColors(_ rgbaImage:RGBAImage) -> (R: Int, G: Int, B: Int) {
-        let total = rgbaImage.pixels.reduce((0, 0, 0)) { (accumulator: (Int, Int, Int), pixel) -> (Int, Int, Int) in
-            return (accumulator.0 + Int(pixel.red), accumulator.1 + Int(pixel.green), accumulator.2 + Int(pixel.blue))
-        }
-        return (total.0/rgbaImage.pixels.count, total.1/rgbaImage.pixels.count, total.2/rgbaImage.pixels.count)
+    open static func apply(filterKey:String, to image: UIImage, in context:CIContext) -> UIImage? {
+        let filter = ImageProcessor.getFilter(filterKey)
+        filter?.setValue(CIImage(image: image), forKey: kCIInputImageKey)
+        if let cgimg = context.createCGImage(filter!.outputImage!, from: filter!.outputImage!.extent) {
+            return UIImage(cgImage: cgimg)
+        } else { return nil }
     }
     
     open static func drawText(_ text: String, inImage: UIImage, atPoint: CGPoint) -> UIImage{

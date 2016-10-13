@@ -18,7 +18,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     fileprivate static let ORIGINAL_LABEL = "Original"
     fileprivate static let SAMPLE_IMAGE = UIImage(named: "default")!
     fileprivate static let FILTER_CELL_ID = "FilterCell"
-    fileprivate static let SAMPLE_RGBA_IMAGE = RGBAImage(image: SAMPLE_IMAGE)!
     
     /* Controls */
     
@@ -34,9 +33,8 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* State */
     
     fileprivate var originalImage: UIImage?
-    fileprivate var originalRGBAImage: RGBAImage?
-    
     fileprivate var filteredImage: UIImage?
+    
     var ciContext: CIContext!
     var currentFilter: CIFilter!
     
@@ -101,7 +99,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource */
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return ImageProcessor.FilterType.all.count + 1 // +1 for an original image cell
+        return ImageProcessor.FILTERS.count + 1 // +1 for an original image cell
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -110,12 +108,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             cell.labelView.text = ViewController.ORIGINAL_LABEL
             cell.imageView.image = originalImage
         } else {
-            let filterKey = ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue
+            let filterKey = ImageProcessor.FILTERS[(indexPath as NSIndexPath).row - 1]
             cell.labelView.text = filterKey
-            
-            let start:Double = CACurrentMediaTime();
-            cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(originalRGBAImage!).toUIImage()
-            print(filterKey + " takes " + String(CACurrentMediaTime() - start) + "s to process " + String(self.originalRGBAImage!.pixels.count) + " pixels")
+            cell.imageView.image = ImageProcessor
+                .apply(filterKey: ImageProcessor.FILTERS[(indexPath as NSIndexPath).row - 1],
+                       to: originalImage!,
+                       in: ciContext)
         }
         return cell
     }
@@ -126,8 +124,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             imageView.image = originalImage
         } else {
             filteredImage = ImageProcessor
-                .getFilter(ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue)
-                .apply(originalRGBAImage!).toUIImage()
+                .apply(filterKey: ImageProcessor.FILTERS[(indexPath as NSIndexPath).row - 1],
+                       to: originalImage!,
+                       in: ciContext)
             imageView.image = filteredImage
             compareButton.isEnabled = true
         }
@@ -136,18 +135,11 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource: end */
     
     override func viewDidLoad() {
-        
         super.viewDidLoad()
-        
         ciContext = CIContext()
-        currentFilter = CIFilter(name: "CISepiaTone")
-        
-        currentFilter = GrayScaleCIFilter()
-        
         initImageViews()
         initCompareButton()
         initFilterMenu()
-//        applyProcessing()
     }
 
     override func didReceiveMemoryWarning() {
@@ -246,31 +238,25 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     fileprivate func updateOriginalImage(_ image: UIImage) {
-        
         originalImage = image
-        
-        originalRGBAImage = RGBAImage(image: originalImage!)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
-        
-        self.filtersCollectionView.reloadData()
-        
-        applyProcessing()
+        filtersCollectionView.reloadData()
     }
     
     private func setFilter(filterKey:String) {
 
-        guard originalImage != nil else { return }
-        
-        currentFilter = CIFilter(name: filterKey)
-        let beginImage = CIImage(image: originalImage!)
-        currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
-        
-        applyProcessing()
+//        guard originalImage != nil else { return }
+//        
+//        currentFilter = CIFilter(name: filterKey)
+//        let beginImage = CIImage(image: originalImage!)
+//        currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
+//        
+//        applyProcessing()
     }
     
     @IBAction func intensityChanged(_ sender: AnyObject) {
-        applyProcessing()
+//        applyProcessing()
     }
     
     private func applyProcessing() {
@@ -283,13 +269,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
 //        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(intensity.value * 10, forKey: kCIInputScaleKey) }
 //        if inputKeys.contains(kCIInputCenterKey) { currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey) }
     
-        currentFilter.setValue(CIImage(image: originalImage!), forKey: kCIInputImageKey)
-        
-        let start:Double = CACurrentMediaTime();
-        if let cgimg = ciContext.createCGImage(currentFilter.outputImage!, from: currentFilter.outputImage!.extent) {
-            imageView.image = UIImage(cgImage: cgimg)
-        }
-        print("CI takes " + String(CACurrentMediaTime() - start) + "s to process " + String(self.originalRGBAImage!.pixels.count) + " pixels")
+//        currentFilter.setValue(CIImage(image: originalImage!), forKey: kCIInputImageKey)
+//        if let cgimg = ciContext.createCGImage(currentFilter.outputImage!, from: currentFilter.outputImage!.extent) {
+//            imageView.image = UIImage(cgImage: cgimg)
+//        }
     }
 }
 
