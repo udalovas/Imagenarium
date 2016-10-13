@@ -140,6 +140,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         initImageViews()
         initCompareButton()
         initFilterMenu()
+        updateOriginalImage(ViewController.SAMPLE_IMAGE)
     }
 
     override func didReceiveMemoryWarning() {
@@ -221,20 +222,15 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         filtersCollectionView.delegate = self
         filtersCollectionView.translatesAutoresizingMaskIntoConstraints = false
         filtersCollectionView.backgroundColor = UIColor.white.withAlphaComponent(0.5)
-//        filtersCollectionView.setCollectionViewLayout(UICollectionViewFlowLayout(), animated: true)
     }
     
     fileprivate func initImageViews() {
-        
-        updateOriginalImage(ViewController.SAMPLE_IMAGE)
-        
+        originalImageView.translatesAutoresizingMaskIntoConstraints = false
         let pressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(ViewController.onImageTouch(_:)))
         pressRecognizer.minimumPressDuration = 0.1
         imageView.addGestureRecognizer(pressRecognizer)
         imageView.image = originalImage
         imageView.isUserInteractionEnabled = true
-        
-        originalImageView.translatesAutoresizingMaskIntoConstraints = false
     }
     
     fileprivate func updateOriginalImage(_ image: UIImage) {
@@ -242,37 +238,6 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
         filtersCollectionView.reloadData()
-    }
-    
-    private func setFilter(filterKey:String) {
-
-//        guard originalImage != nil else { return }
-//        
-//        currentFilter = CIFilter(name: filterKey)
-//        let beginImage = CIImage(image: originalImage!)
-//        currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
-//        
-//        applyProcessing()
-    }
-    
-    @IBAction func intensityChanged(_ sender: AnyObject) {
-//        applyProcessing()
-    }
-    
-    private func applyProcessing() {
-//        currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
-        
-//        let inputKeys = currentFilter.inputKeys
-//        
-//        if inputKeys.contains(kCIInputIntensityKey) { currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey) }
-//        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(intensity.value * 200, forKey: kCIInputRadiusKey) }
-//        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(intensity.value * 10, forKey: kCIInputScaleKey) }
-//        if inputKeys.contains(kCIInputCenterKey) { currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey) }
-    
-//        currentFilter.setValue(CIImage(image: originalImage!), forKey: kCIInputImageKey)
-//        if let cgimg = ciContext.createCGImage(currentFilter.outputImage!, from: currentFilter.outputImage!.extent) {
-//            imageView.image = UIImage(cgImage: cgimg)
-//        }
     }
 }
 
