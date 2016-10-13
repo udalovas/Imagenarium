@@ -1,7 +1,4 @@
 //
-//  FiltererTests.swift
-//  FiltererTests
-//
 //  Created by Алексей Удалов on 20/09/16.
 //  Copyright © 2016 udalovas. All rights reserved.
 //

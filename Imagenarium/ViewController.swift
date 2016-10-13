@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreImage
 
 class ViewController: UIViewController, UINavigationControllerDelegate, UIImagePickerControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
     
@@ -15,8 +16,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     fileprivate static let FADE_ANIMATION_DURATION:TimeInterval = 0.4
     fileprivate static let FILTER_MENU_HEIGHT:UInt8 = 50
     fileprivate static let ORIGINAL_LABEL = "Original"
-    fileprivate static let SAMPLE_IMAGE: UIImage = UIImage(named: "default")!
-    fileprivate static let SAMPLE_RGBA_IMAGE: RGBAImage = RGBAImage(image: SAMPLE_IMAGE)!
+    fileprivate static let SAMPLE_IMAGE = UIImage(named: "default")!
+    fileprivate static let FILTER_CELL_ID = "FilterCell"
+    fileprivate static let SAMPLE_RGBA_IMAGE = RGBAImage(image: SAMPLE_IMAGE)!
     
     /* Controls */
     
@@ -33,7 +35,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     fileprivate var originalImage: UIImage?
     fileprivate var originalRGBAImage: RGBAImage?
+    
     fileprivate var filteredImage: UIImage?
+    var ciContext: CIContext!
+    var currentFilter: CIFilter!
     
     /* Action! */
 
@@ -100,14 +105,17 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = filtersCollectionView.dequeueReusableCell(withReuseIdentifier: "FilterCell", for: indexPath) as! FilterCellView
+        let cell = filtersCollectionView.dequeueReusableCell(withReuseIdentifier: ViewController.FILTER_CELL_ID, for: indexPath) as! FilterCellView
         if((indexPath as NSIndexPath).row == 0) {
             cell.labelView.text = ViewController.ORIGINAL_LABEL
             cell.imageView.image = originalImage
         } else {
             let filterKey = ImageProcessor.FilterType.all[(indexPath as NSIndexPath).row - 1].rawValue
             cell.labelView.text = filterKey
+            
+            let start:Double = CACurrentMediaTime();
             cell.imageView.image = ImageProcessor.getFilter(filterKey).apply(originalRGBAImage!).toUIImage()
+            print(filterKey + " takes " + String(CACurrentMediaTime() - start) + "s to process " + String(self.originalRGBAImage!.pixels.count) + " pixels")
         }
         return cell
     }
@@ -128,10 +136,18 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     /* UICollectionViewDataSource: end */
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
+        
+        ciContext = CIContext()
+        currentFilter = CIFilter(name: "CISepiaTone")
+        
+        currentFilter = GrayScaleCIFilter()
+        
         initImageViews()
         initCompareButton()
         initFilterMenu()
+//        applyProcessing()
     }
 
     override func didReceiveMemoryWarning() {
@@ -230,11 +246,50 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     fileprivate func updateOriginalImage(_ image: UIImage) {
+        
         originalImage = image
+        
         originalRGBAImage = RGBAImage(image: originalImage!)
         originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
+        
         self.filtersCollectionView.reloadData()
+        
+        applyProcessing()
+    }
+    
+    private func setFilter(filterKey:String) {
+
+        guard originalImage != nil else { return }
+        
+        currentFilter = CIFilter(name: filterKey)
+        let beginImage = CIImage(image: originalImage!)
+        currentFilter.setValue(beginImage, forKey: kCIInputImageKey)
+        
+        applyProcessing()
+    }
+    
+    @IBAction func intensityChanged(_ sender: AnyObject) {
+        applyProcessing()
+    }
+    
+    private func applyProcessing() {
+//        currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey)
+        
+//        let inputKeys = currentFilter.inputKeys
+//        
+//        if inputKeys.contains(kCIInputIntensityKey) { currentFilter.setValue(intensity.value, forKey: kCIInputIntensityKey) }
+//        if inputKeys.contains(kCIInputRadiusKey) { currentFilter.setValue(intensity.value * 200, forKey: kCIInputRadiusKey) }
+//        if inputKeys.contains(kCIInputScaleKey) { currentFilter.setValue(intensity.value * 10, forKey: kCIInputScaleKey) }
+//        if inputKeys.contains(kCIInputCenterKey) { currentFilter.setValue(CIVector(x: currentImage.size.width / 2, y: currentImage.size.height / 2), forKey: kCIInputCenterKey) }
+    
+        currentFilter.setValue(CIImage(image: originalImage!), forKey: kCIInputImageKey)
+        
+        let start:Double = CACurrentMediaTime();
+        if let cgimg = ciContext.createCGImage(currentFilter.outputImage!, from: currentFilter.outputImage!.extent) {
+            imageView.image = UIImage(cgImage: cgimg)
+        }
+        print("CI takes " + String(CACurrentMediaTime() - start) + "s to process " + String(self.originalRGBAImage!.pixels.count) + " pixels")
     }
 }
 
