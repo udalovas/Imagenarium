@@ -21,11 +21,12 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* Controls */
     
-    @IBOutlet var mainStackView: UIStackView!
-    @IBOutlet var originalImageView: UIImageView!
+    @IBOutlet var mainContainerStackView: UIStackView!
+    @IBOutlet var originalImageOverlayView: UIImageView!
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var filtersCollectionView: UICollectionView!
-    @IBOutlet var bottomMenu: UIView!
+    @IBOutlet var bottomMenuView: UIView!
+    
     @IBOutlet var filterButton: UIButton!
     @IBOutlet var compareButton: UIButton!
     @IBOutlet var newPhotoButton: UIButton!
@@ -34,14 +35,16 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     fileprivate var originalImage: UIImage?
     fileprivate var filteredImage: UIImage?
-    
-    var ciContext: CIContext!
-    var currentFilter: CIFilter!
+    fileprivate var ciContext: CIContext!
+    fileprivate var currentFilter: CIFilter!
     
     /* Action! */
 
     @IBAction func onNewPhoto(_ sender: UIButton) {
-        // TODO need to create each time?..
+        self.present(createPhotoPickerActionSheet(), animated: true, completion: nil)
+    }
+    
+    private func createPhotoPickerActionSheet() -> UIAlertController {
         let photoActionSheet = UIAlertController(title: "New Photo", message: nil, preferredStyle: .actionSheet)
         photoActionSheet.popoverPresentationController?.sourceView = newPhotoButton
         photoActionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: { action in
@@ -51,7 +54,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             self.showAlbum()
         }))
         photoActionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        self.present(photoActionSheet, animated: true, completion: nil)
+        return photoActionSheet
     }
     
     @IBAction func onShare(_ sender: UIButton) {
@@ -87,7 +90,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         dismiss(animated: true, completion: nil)
-        updateOriginalImage(info[UIImagePickerControllerOriginalImage] as! UIImage)
+        setOriginalImage(info[UIImagePickerControllerOriginalImage] as! UIImage)
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
@@ -96,7 +99,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     /* UIImagePickerControllerDelegate: end */
     
-    /* UICollectionViewDataSource */
+    /* UICollectionViewDataSource: start */
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return ImageProcessor.FILTERS.count + 1 // +1 for an original image cell
@@ -123,10 +126,10 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
             filteredImage = originalImage
             imageView.image = originalImage
         } else {
-            filteredImage = ImageProcessor
-                .apply(filterKey: ImageProcessor.FILTERS[(indexPath as NSIndexPath).row - 1],
-                       to: originalImage!,
-                       in: ciContext)
+            filteredImage = ImageProcessor.apply(
+                filterKey: ImageProcessor.FILTERS[(indexPath as NSIndexPath).row - 1],
+                to: originalImage!,
+                in: ciContext)
             imageView.image = filteredImage
             compareButton.isEnabled = true
         }
@@ -140,7 +143,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         initImageViews()
         initCompareButton()
         initFilterMenu()
-        updateOriginalImage(ViewController.SAMPLE_IMAGE)
+        setOriginalImage(ViewController.SAMPLE_IMAGE)
     }
 
     override func didReceiveMemoryWarning() {
@@ -150,7 +153,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     @IBAction func onCompareTouchDown(_ sender: UIButton) {
         if(sender.isSelected) {
-            hide(originalImageView)
+            hide(originalImageOverlayView)
         } else {
             showOriginalOverlay()
             toggleFilterMenu(false)
@@ -178,10 +181,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     
     func showFiltersCollection() {
         view.addSubview(filtersCollectionView)
-        // really need to create all this constraints each time?..
-        let bottomConstraint = filtersCollectionView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
-        let leftConstraint = filtersCollectionView.leftAnchor.constraint(equalTo: bottomMenu.leftAnchor)
-        let rightConstraint = filtersCollectionView.rightAnchor.constraint(equalTo: bottomMenu.rightAnchor)
+        let bottomConstraint = filtersCollectionView.bottomAnchor.constraint(equalTo: bottomMenuView.topAnchor)
+        let leftConstraint = filtersCollectionView.leftAnchor.constraint(equalTo: bottomMenuView.leftAnchor)
+        let rightConstraint = filtersCollectionView.rightAnchor.constraint(equalTo: bottomMenuView.rightAnchor)
         let heightConstraint = filtersCollectionView.heightAnchor.constraint(equalToConstant: CGFloat(ViewController.FILTER_MENU_HEIGHT))
         NSLayoutConstraint.activate([bottomConstraint, leftConstraint, rightConstraint, heightConstraint])
         view.layoutIfNeeded()
@@ -189,15 +191,14 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     func showOriginalOverlay() {
-        view.addSubview(originalImageView)
-        // really need to create all this constraints each time?..
-        let topConstraint = originalImageView.topAnchor.constraint(equalTo: mainStackView.topAnchor)
-        let bottomConstraint = originalImageView.bottomAnchor.constraint(equalTo: bottomMenu.topAnchor)
-        let leftConstraint = originalImageView.leftAnchor.constraint(equalTo: mainStackView.leftAnchor)
-        let rightConstraint = originalImageView.rightAnchor.constraint(equalTo: mainStackView.rightAnchor)
+        view.addSubview(originalImageOverlayView)
+        let topConstraint = originalImageOverlayView.topAnchor.constraint(equalTo: mainContainerStackView.topAnchor)
+        let bottomConstraint = originalImageOverlayView.bottomAnchor.constraint(equalTo: bottomMenuView.topAnchor)
+        let leftConstraint = originalImageOverlayView.leftAnchor.constraint(equalTo: mainContainerStackView.leftAnchor)
+        let rightConstraint = originalImageOverlayView.rightAnchor.constraint(equalTo: mainContainerStackView.rightAnchor)
         NSLayoutConstraint.activate([topConstraint, leftConstraint, rightConstraint, bottomConstraint])
         view.layoutIfNeeded()
-        show(originalImageView)
+        show(originalImageOverlayView)
     }
     
     fileprivate func hide(_ view: UIView) {
@@ -225,7 +226,7 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
     }
     
     fileprivate func initImageViews() {
-        originalImageView.translatesAutoresizingMaskIntoConstraints = false
+        originalImageOverlayView.translatesAutoresizingMaskIntoConstraints = false
         let pressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(ViewController.onImageTouch(_:)))
         pressRecognizer.minimumPressDuration = 0.1
         imageView.addGestureRecognizer(pressRecognizer)
@@ -233,9 +234,9 @@ class ViewController: UIViewController, UINavigationControllerDelegate, UIImageP
         imageView.isUserInteractionEnabled = true
     }
     
-    fileprivate func updateOriginalImage(_ image: UIImage) {
+    fileprivate func setOriginalImage(_ image: UIImage) {
         originalImage = image
-        originalImageView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
+        originalImageOverlayView.image = ImageProcessor.drawText(ViewController.ORIGINAL_LABEL, inImage: originalImage!, atPoint: CGPoint(x: 20, y: 20))
         imageView.image = originalImage
         filtersCollectionView.reloadData()
     }

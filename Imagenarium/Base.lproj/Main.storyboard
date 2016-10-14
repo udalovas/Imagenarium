@@ -107,14 +107,14 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="bottomMenu" destination="8kH-P7-39w" id="xjB-0M-A3V"/>
+                        <outlet property="bottomMenuView" destination="8kH-P7-39w" id="VD5-QL-k2g"/>
                         <outlet property="compareButton" destination="j4h-ny-RaT" id="UVr-D9-o5m"/>
                         <outlet property="filterButton" destination="si7-GY-Tod" id="x6g-W0-Rp8"/>
                         <outlet property="filtersCollectionView" destination="f1r-nx-eqN" id="8jR-9i-KZ4"/>
                         <outlet property="imageView" destination="qoN-Ng-MGG" id="Anm-dN-tsf"/>
-                        <outlet property="mainStackView" destination="fLt-Q1-LWk" id="nP8-6Z-dWt"/>
+                        <outlet property="mainContainerStackView" destination="fLt-Q1-LWk" id="Lag-vT-h2M"/>
                         <outlet property="newPhotoButton" destination="7fF-C1-Lal" id="qGh-vp-rqr"/>
-                        <outlet property="originalImageView" destination="pWa-AU-nKx" id="WUa-vX-DrJ"/>
+                        <outlet property="originalImageOverlayView" destination="pWa-AU-nKx" id="Mp6-iO-sWu"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
